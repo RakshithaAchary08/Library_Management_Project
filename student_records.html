@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Student Records</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to right, #f9f9f9, #e6f7ff);
+      margin: 0;
+      padding: 20px;
+    }
+
+    h2 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 20px;
+      font-size: 28px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      box-shadow: 0px 4px 10px rgba(0,0,0,0.1);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    th, td {
+      border: 1px solid #ddd;
+      padding: 12px;
+      text-align: center;
+      font-size: 15px;
+    }
+
+    th {
+      background: linear-gradient(to right, #00c6ff, #0072ff);
+      color: white;
+      font-weight: bold;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+
+    tr:hover {
+      background-color: #e6f7ff;
+      transition: 0.3s;
+    }
+
+    button {
+      padding: 8px 12px;
+      background: #0072ff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #0056cc;
+    }
+
+    #studentTable {
+      margin: auto;
+      max-width: 95%;
+    }
+
+    .back-btn {
+      display: block;
+      margin: 20px auto;
+      padding: 10px 20px;
+      font-size: 16px;
+      background: #ff5e62;
+      border: none;
+      color: white;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .back-btn:hover {
+      background: #e84148;
+    }
+  </style>
+</head>
+<body>
+  <h2>📑 Student Records</h2>
+  <table id="studentTable">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Book</th>
+        <th>Issued Date</th>
+        <th>Return Date</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+  <button class="back-btn" onclick="window.location.href='index.html'">⬅ Back</button>
+
+  <script>
+    // Format date helper
+    function formatDate(dateStr) {
+      if (!dateStr) return "";
+      const date = new Date(dateStr);
+      return date.toLocaleString("en-GB", {
+        day: "2-digit", month: "short", year: "numeric",
+        hour: "2-digit", minute: "2-digit"
+      });
+    }
+
+    // Fetch and display records in table
+    async function loadStudentRecords() {
+      let res = await fetch("students.php?action=list");
+      let records = await res.json();
+      const tbody = document.querySelector("#studentTable tbody");
+      tbody.innerHTML = "";
+
+      if (records.length === 0) {
+        tbody.innerHTML = "<tr><td colspan='6'>No records found</td></tr>";
+        return;
+      }
+
+      records.forEach(record => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${record.student_id}</td>
+          <td>${record.student_name}</td>
+          <td>${record.issued_book}</td>
+          <td>${formatDate(record.issue_date)}</td>
+          <td>${formatDate(record.return_date)}</td>
+          <td><button onclick="deleteStudent(${record.id})">Delete</button></td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
+
+    // Delete record
+    async function deleteStudent(id) {
+      await fetch("students.php?action=delete", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id })
+      });
+      loadStudentRecords();
+    }
+
+    // Load on page open
+    loadStudentRecords();
+  </script>
+</body>
+</html>
