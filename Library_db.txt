@@ -1,0 +1,39 @@
+CREATE DATABASE library_db;
+USE library_db;
+
+CREATE TABLE users (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  username VARCHAR(100) UNIQUE NOT NULL,
+  password VARCHAR(255) NOT NULL,  -- store hashed password
+  role ENUM('admin') DEFAULT 'admin',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+
+
+CREATE TABLE books (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  department VARCHAR(100) NOT NULL,
+  branch VARCHAR(100) NOT NULL,
+  title VARCHAR(255) NOT NULL,
+  author VARCHAR(255) NOT NULL,
+  cupboard VARCHAR(50) NOT NULL,
+  image VARCHAR(255) DEFAULT NULL, -- uploaded image path
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+
+
+INSERT INTO users (username, password) 
+VALUES ('admin', MD5('admin123'));  
+-- (use MD5 for demo, but in production use password_hash in PHP)
+
+CREATE TABLE student_records (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  student_id VARCHAR(50) NOT NULL,
+  student_name VARCHAR(150) NOT NULL,
+  issued_book VARCHAR(255) NOT NULL,
+  issue_date DATETIME NOT NULL,
+  return_date DATETIME NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
